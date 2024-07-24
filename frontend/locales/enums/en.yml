@@ -1,0 +1,12 @@
+en:
+  enumeration_names:
+    qualifier: Name Qualifier      
+  enumerations:
+    qualifier:
+      acronym: "Acronym"
+      married_wife: "Married Name"
+      official: "Official Name"
+      pseudonym: "Pseudonym"
+      religious: "Religious Name"
+      signature: "Signature"
+      full: "Full Name"
