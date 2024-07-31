@@ -11,41 +11,59 @@ require 'db/migrations/utils'
   
   # the tables containing a "qualifier" column
   tables = [:name_person, :parallel_name_person, :name_corporate_entity, :parallel_name_corporate_entity, :name_family, :parallel_name_family, :name_software, :parallel_name_software]
+  
+  # the name of the enum
+  enum_name = "qualifier_type"
+
+  enum_source_field = :qualifier
+  enum_target_field = :qualifier_id
 
   up do
   
     # create an array of unique values for all "qualifier" fields in the selected tables
-    qualifier_values = []
+    enum_values = []
   
     tables.each do |table|
-      qualifier_values += from(table).exclude(qualifier: nil).map(:qualifier).uniq
+      enum_values += from(table).exclude(qualifier: nil).map(:qualifier).uniq
     end
   
-    qualifier_values = qualifier_values.uniq
-  
+    enum_values = enum_values.uniq
+
+    enum_id= from(:enumeration).filter(:name => enum_name).get(:id)
       
-    # create a dynamic editable enum, based on the values in the qualifier_values arrary
-    create_editable_enum("qualifier_type", qualifier_values)
-     
-    # get the id code for the qualifier enum
-    qualifier_enum_id = from(:enumeration).filter(:name => 'qualifier_type').get(:id)
+    # create a dynamic editable enum, based on the values in the enum_values arrary
+    unless enum_id
+      create_editable_enum(enum_name, enum_values)
+    end
+    
+    # get the id code for the enum
+    enum_id= from(:enumeration).filter(:name => enum_name).get(:id)
     
     # report which values have been created and should be included in the translation file
-    $stderr.puts("An editable enumeration list 'qualifier_type' has been created in the database. Make sure you have following section in your enumeration translation file (with translated values):")
+    $stderr.puts("An editable enumeration list '#{enum_name}' has been created in the database. Make sure you have following section in your enumeration translation file (with translated values):")
     $stderr.puts("--------------")
-    $stderr.puts("    qualifier_type:")
-    from(:enumeration_value).where(enumeration_id: qualifier_enum_id).map(:value).each do |value|
+    $stderr.puts("    #{enum_name}:")
+    from(:enumeration_value).where(enumeration_id: enum_id).map(:value).each do |value|
       $stderr.puts("      " + value + ': "' + value + '"')
     end
     $stderr.puts("--------------")
 
-    # loop over the tables, add a qualifier_id column, and populate it with the corresponding enumeration value id
-    tables.each do |table|   
-      add_column table, :qualifier_id, Integer
-      from(table).update(qualifier_id: from(:enumeration_value).
+    # loop over the tables, add an enum_target_field column, and populate it with the corresponding enumeration value id
+    tables.each do |table|
+      unless self.schema(table).map(&:first).include?(enum_target_field)
+        alter_table(table) do
+          add_column(enum_target_field, :integer, :null => true)
+        end
+      end
+      from(table).update(enum_target_field => from(:enumeration_value).
         select{id}.
-        where(enumeration_id: qualifier_enum_id, value: Sequel[table][:qualifier])
+        where(enumeration_id: enum_id, value: Sequel[table][:qualifier])
       )
+      #alter_table(table) do
+      #  enum_source_field_orig =(enum_source_field.to_s + '_orig').to_sym
+      #  rename_column(enum_source_field, enum_source_field_orig)
+      #end
+
     end
 
   end
@@ -53,7 +71,7 @@ require 'db/migrations/utils'
   down do
     tables.each do |table|
       alter_table(table) do
-        drop_column(:qualifier_id)
+        drop_column(enum_target_field)
       end
     end
   end
