@@ -20,11 +20,11 @@ Sequel.migration do
   up do
 
     # create a dynamic editable enum, based on the values in the qualifier_types map
-    create_editable_enum("qualifier", qualifier_types.map { |k,v| v })
-    #create_editable_enum("qualifier", qualifier_types.map { |k,v| k })
+    create_editable_enum("qualifier_type", qualifier_types.map { |k,v| v })
+    #create_editable_enum("qualifier_type", qualifier_types.map { |k,v| k })
     
     # get the id code for the qualifier enum
-    qualifier_enum_id= self[:enumeration].filter(:name => 'qualifier').get(:id)
+    qualifier_enum_id= self[:enumeration].filter(:name => 'qualifier_type').get(:id)
     
     # loop over the tables, add a qualifier_id column, and populate it with the corresponding enumeration value id
     tables.each do |table|

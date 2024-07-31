@@ -1,8 +1,8 @@
 en:
   enumeration_names:
-    qualifier: Name Qualifier      
+    qualifier_type: Name Qualifier      
   enumerations:
-    qualifier:
+    qualifier_type:
       acronym: "Acronym"
       married: "Married Name"
       official: "Official Name"

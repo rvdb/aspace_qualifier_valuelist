@@ -4,8 +4,8 @@ require 'db/migrations/utils'
 # NOTE: This is an alternative version of the migration script, creating a dynamic value list for all 
 #       unique (literal) values in "qualifier". Not sure how wise it is for real use, unless you know 
 #       your data. But it works, and pretty fast! In order to use it: 
-#        - remove 001_convert_qualifier_to_known_keys.rb
-#        - remove the underscore from the extension of 001_convert_qualifier_values_to_enum._rb
+#        - rename 001_convert_qualifier_to_known_keys.rb to _001_convert_qualifier_to_known_keys.rb
+#        - rename this file _001_convert_qualifier_values_to_enum.rb to 001_convert_qualifier_values_to_enum.rb
 
   Sequel.migration do
   
@@ -25,15 +25,15 @@ require 'db/migrations/utils'
   
       
     # create a dynamic editable enum, based on the values in the qualifier_values arrary
-    create_editable_enum("qualifier", qualifier_values)
+    create_editable_enum("qualifier_type", qualifier_values)
      
     # get the id code for the qualifier enum
-    qualifier_enum_id = from(:enumeration).filter(:name => 'qualifier').get(:id)
+    qualifier_enum_id = from(:enumeration).filter(:name => 'qualifier_type').get(:id)
     
     # report which values have been created and should be included in the translation file
-    $stderr.puts("An editable enumeration list 'qualifier' has been created in the database. Make sure you have following section in your enumeration translation file (with translated values):")
+    $stderr.puts("An editable enumeration list 'qualifier_type' has been created in the database. Make sure you have following section in your enumeration translation file (with translated values):")
     $stderr.puts("--------------")
-    $stderr.puts("    qualifier:")
+    $stderr.puts("    qualifier_type:")
     from(:enumeration_value).where(enumeration_id: qualifier_enum_id).map(:value).each do |value|
       $stderr.puts("      " + value + ': "' + value + '"')
     end

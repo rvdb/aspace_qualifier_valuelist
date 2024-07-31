@@ -10,7 +10,7 @@ module SortNameProcessor
 
       grouped = [json["number"]].reject {|v| v.nil?}
       result << ", #{grouped.join(" : ")}" if not grouped.empty?
-      result << " (#{I18n.t('enumerations.qualifier.'+json['qualifier'], :default => json['qualifier'])})" if json["qualifier"]
+      result << " (#{I18n.t('enumerations.qualifier_type.'+json['qualifier'], :default => json['qualifier'])})" if json["qualifier"]
 
       result << " (#{json["dates"]})" if json["dates"]
       result << " (#{json["location"]})" if json["location"]
@@ -25,7 +25,7 @@ module SortNameProcessor
 
       result << json["family_name"] if json["family_name"]
       result << ", #{json["prefix"]}" if json["prefix"]
-      result << " (#{I18n.t('enumerations.qualifier.'+json['qualifier'], :default => json['qualifier'])})" if json["qualifier"]
+      result << " (#{I18n.t('enumerations.qualifier_type.'+json['qualifier'], :default => json['qualifier'])})" if json["qualifier"]
 
       result << " (#{json["dates"]})" if json["dates"]
       result << " (#{json["location"]})" if json["location"]
@@ -54,7 +54,7 @@ module SortNameProcessor
       result << ", #{json["number"]}" if json["number"]
       result << " (#{json["fuller_form"]})" if json["fuller_form"]
       result << ", #{json["dates"]}" if json["dates"]
-      result << " (#{I18n.t('enumerations.qualifier.'+json['qualifier'], :default => json['qualifier'])})" if json["qualifier"]
+      result << " (#{I18n.t('enumerations.qualifier_type.'+json['qualifier'], :default => json['qualifier'])})" if json["qualifier"]
 
       dates = json['dates'].nil? ? SortNameProcessor::Utils.first_date(extras, 'dates_of_existence') : nil
       result << " (#{dates})" if dates
